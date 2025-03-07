@@ -1,16 +1,17 @@
 package revature.pro0.controller;
 
 import io.javalin.http.Context;
-
 import java.util.List;
 import jakarta.servlet.http.HttpSession;
 import java.sql.*;
-
 import revature.pro0.dto.UserAuthRequestDTO;
 import revature.pro0.model.User;
 import revature.pro0.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserControl {
+    private static final Logger lg = LoggerFactory.getLogger(UserControl.class);
 
     private final UserService userService;
 
@@ -25,13 +26,16 @@ public class UserControl {
     *  * */
     public void register(Context cont){
         User user = cont.bodyAsClass(User.class);
+        lg.info("Attempting to register a user");
 
         //basic validation
         if(user.getEmail() == null || user.getPassword() == null){
             cont.status(400).json("{\"Error\":\"Missing email or password\"}");
+            lg.error("Didnt work. Missing a field");
             return;
         }else{
             cont.status(409).json("{\"Error\":\"Can't register email as it already exists\"}");
+            lg.error("Didnt work. Email already exists");
         }
         User newUser = userService.registerUser(user.getUser_id(), user.getEmail(), user.getPassword());
         //checking if email already exists
@@ -44,8 +48,10 @@ public class UserControl {
         boolean created = createUserDB(newUser);
         if(created){
             cont.status(201).json(user);
+            lg.info("User registered");
         }else{
             cont.status(500).json("{\"Error\":\"Failed to register user. Try again\"}");
+            lg.error("Something went wrong :/");
         }
     }
 
@@ -57,9 +63,10 @@ public class UserControl {
     * */
     public void login(Context cont){
         UserAuthRequestDTO user = cont.bodyAsClass(UserAuthRequestDTO.class);
-
+        lg.info("Attempting to login");
         if(user.getEmail() == null || user.getPassword() == null){
             cont.status(400).json("{\"Error\":\"Email or password not typed in\"}");
+            lg.error("Missing fields");
             return;
         }
 
@@ -75,11 +82,13 @@ public class UserControl {
         User dbUser = getUserDB(user.getEmail());
         if(dbUser == null){
             cont.status(401).json("{\"Error\":\"Invalid email or password\"}");
+            lg.error("Invalid credential: email");
             return;
         }
         //compare password
         if(!dbUser.getPassword().equals(user.getPassword())){
             cont.status(401).json("{\"Error\":\"Invalid email or password\"}");
+            lg.error("Invalid credential: password");
             return;
         }
 
@@ -87,7 +96,7 @@ public class UserControl {
         HttpSession session = cont.req().getSession(true);
         session.setAttribute("user", dbUser);
         cont.status(200).json(dbUser);
-
+        lg.info("All went good, we can start a session");
     }
 
     /*
@@ -120,6 +129,7 @@ public class UserControl {
     public void getAllUsers(Context cont){
         List<User> users = userService.getAllUsers();
         cont.json(users);
+        lg.info("Getting all users...");
     }
 
     private static final String jdbcUrl = "jdbc:postgresql://localhost:5432/postgres";

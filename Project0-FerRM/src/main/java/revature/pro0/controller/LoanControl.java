@@ -4,12 +4,14 @@ import revature.pro0.dto.LoanRequestDTO;
 import revature.pro0.model.Loan;
 import revature.pro0.service.LoanService;
 import io.javalin.http.Context;
-
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class LoanControl {
+    private static final Logger lg = LoggerFactory.getLogger(LoanControl.class);
 
     private final LoanService loanService;
 
@@ -29,9 +31,10 @@ public class LoanControl {
     * */
     public void createLoan(Context cont){
         LoanRequestDTO req = cont.bodyAsClass(LoanRequestDTO.class);
-
+        lg.info("Creating a loan...");
         if(req.getLoan_name() == null || req.getLoan_name().trim().isEmpty()){
             cont.status(400).json("{\"error\":\"Missing Loan name\"}");
+            lg.error("Error at creating a loan");
         return;
         }
 
@@ -49,14 +52,17 @@ public class LoanControl {
     /*GET /loans?userId=1
     * using userId if present, otherwise shows all loans */
     public void getLoans(Context cont){
+        lg.info("getting loans from a user");
         String borrowerIDP = cont.queryParam("borrowerId");
         if(borrowerIDP != null){
             int userId = Integer.parseInt(borrowerIDP);
             List<Loan> userLoans = loanService.getUserLoans(userId);
             cont.json(userLoans);
+            lg.info("got loans");
         }else{
             List<Loan> allLoans = loanService.getAllLoans();
             cont.json(allLoans);
+            lg.info("didnt find user, get all loans");
         }
     }
 
@@ -71,7 +77,7 @@ public class LoanControl {
     public void updateLoan(Context cont){
         int loanId = Integer.parseInt(cont.pathParam("id"));
         LoanRequestDTO req = cont.bodyAsClass(LoanRequestDTO.class);
-
+        lg.info("updating a loan");
         Loan loan = new Loan();
         loan.setLoan_id(loanId);
         loan.setLoan_name(req.getLoan_name());
@@ -87,6 +93,7 @@ public class LoanControl {
         int loanId = Integer.parseInt(cont.pathParam("id"));
         loanService.deleteLoan(loanId);
         cont.status(200).json("{\"msg:\":\"Loan has been deleted\"}");
+        lg.info("Deleting a loan...");
     }
     /*GET /loans   */
     public void getAllLoans(Context cont){
