@@ -24,24 +24,24 @@ public class UserControl {
     * }
     *  * */
     public void register(Context cont){
-        UserAuthRequestDTO user = cont.bodyAsClass(UserAuthRequestDTO.class);
+        User user = cont.bodyAsClass(User.class);
 
         //basic validation
         if(user.getEmail() == null || user.getPassword() == null){
             cont.status(400).json("{\"Error\":\"Missing email or password\"}");
             return;
-        }/*else{
+        }else{
             cont.status(409).json("{\"Error\":\"Can't register email as it already exists\"}");
-        }*/
-        User newUser = userService.registerUser(user.getAccount_id(), user.getEmail(), user.getPassword());
-        //checking if email already exists
-        if(userExists(user.getEmail())){
-            cont.status(409).json("{\"Error\":\"Email already exists. Please login\"}");
-            return;
         }
+        User newUser = userService.registerUser(user.getUser_id(), user.getEmail(), user.getPassword());
+        //checking if email already exists
+//        if(userExists(user.getEmail())){
+//            cont.status(409).json("{\"Error\":\"Email already exists. Please login\"}");
+//            return;
+//        }
 
         //Insert new user
-        boolean created = createUserDB(user);
+        boolean created = createUserDB(newUser);
         if(created){
             cont.status(201).json(user);
         }else{
@@ -95,11 +95,11 @@ public class UserControl {
     * */
     //check if user is logged in
     public static void checkLogin(Context cont){
-//        UserAuthRequestDTO user = cont.bodyAsClass(UserAuthRequestDTO.class);
+        UserAuthRequestDTO user = cont.bodyAsClass(UserAuthRequestDTO.class);
         HttpSession session = cont.req().getSession(false);
         if(session != null && session.getAttribute("user") != null){
-            User user = (User) session.getAttribute("user");
-            cont.status(200).json(user);
+            User userr = (User) session.getAttribute("user");
+            cont.status(200).json(userr);
         }else{
             cont.status(401).json("\"Error\":\"Not logged in\"}");
         }
@@ -139,8 +139,8 @@ public class UserControl {
         }
     }
 
-    private static boolean createUserDB(UserAuthRequestDTO user){
-        String sql ="INSERT INTO users (email, password) VALUES (?, ?)";
+    private static boolean createUserDB(User user){
+        String sql ="INSERT INTO accounts(email, password) VALUES (?, ?)";
         try(Connection conn = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
         PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1, user.getEmail());
@@ -162,7 +162,7 @@ public class UserControl {
             if(rS.next()){
                 User user = new User();
                 user.setUser_id(rS.getInt("account_id"));
-                user.setMail(rS.getString("email"));
+                user.setEmail(rS.getString("email"));
                 user.setPassword(rS.getString("password"));
                 return user;
             }

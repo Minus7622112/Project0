@@ -19,19 +19,13 @@ public class UserDao {
     }
 
     public User createUser(User newUser){
-        String sql = "INSERT INTO user_profiles (email, password) VALUES (?, ?)";
+        String sql = "INSERT INTO accounts(email, password) VALUES (?, ?)";
 
         try(Connection conn = DriverManager.getConnection(url, dbUser, dbPassword);
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
 
-//            stmt.setInt(1, newUser.getUserId());
-//            stmt.setString(2, newUser.getFirst());
-//            stmt.setString(3, newUser.getLast());
-//            stmt.setString(4, newUser.getPhone());
-            stmt.setString(1, newUser.getMail());
+            stmt.setString(1, newUser.getEmail());
             stmt.setString(2, newUser.getPassword());
-//            stmt.setDate(6, newUser.getDate());
-//            stmt.setInt(7, getCredit());
             stmt.executeUpdate();
             try(ResultSet genKeys = stmt.getGeneratedKeys()){
                 if(genKeys.next()){

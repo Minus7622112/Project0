@@ -27,7 +27,7 @@ public class Main {
     //Creating tables
     private static final String CREATE_TABLES_SQL = """
         CREATE TABLE IF NOT EXISTS accounts(account_id serial primary key not null, 
-        email varchar(26) not null, password varchar(20) not null, account_type varchar(10));
+        email varchar(26) not null, password text not null, account_type varchar(10));
         
         CREATE TABLE loan_apps(loan_app_id SERIAL primary key not null, principal_balance money not null,
         approved varchar(10), borrower_id int, application_date date not null, loan_name varchar(50) not null,
@@ -39,7 +39,7 @@ public class Main {
     private static final String INSERT_DATA_SQL = """
             INSERT INTO accounts (email, password, account_type) VALUES ('william@boeing.com', 'pass1', 'admin'), ('gillaumefaury@airbus.com', 'a20n', 'user');
             
-            INSERT INTO loan_apps (principal_balance, borrower_id, application_date, loan_name) VALUES ('100', '1', CURRENT_DATE, 'headphones');
+            INSERT INTO loan_apps (principal_balance, approved, borrower_id, application_date, loan_name) VALUES ('100', 'pending', '1', NOW(), 'headphones'), ('200', 'pending', '2', CURRENT_TIMESTAMP, 'pc gamer');
             
             """;
 

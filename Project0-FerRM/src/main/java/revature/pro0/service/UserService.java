@@ -14,16 +14,17 @@ public class UserService {
     public User registerUser(int account_id, String email, String password){
 
         //Hashing password using Bcrypt
-        String hashed = hashPassword(password);
-
-        if(userDao.getUserByUserId(account_id) != null){
-            return null;
-        }
+//        String hashed = hashPassword(password);
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(12));
+//
+//        if(userDao.getUserByUserId(account_id) != null){
+//            return null;
+//        }
 
         User newUser = new User();
-//        newUser.setUser_id(user_id);
+        newUser.setUser_id(account_id);
 //        newUser.setAccount_id(account_id);
-        newUser.setMail(email);
+        newUser.setEmail(email);
         newUser.setPassword(hashed);
 //        newUser.setFirst(first);
 //        newUser.setLast(last);

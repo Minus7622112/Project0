@@ -18,20 +18,18 @@ public class LoanDao {
     }
 
     public Loan createLoan(Loan loan){
-        String sql = "INSERT INTO loan_apps (loan_app_id, principal_balance, term_length, interest, total_balance, borrower_id, application_date, loan_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO loan_apps (loan_app_id, principal_balance, approved, borrower_id, application_date, loan_name) VALUES (?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = DriverManager.getConnection(url, dbUser, dbPassword);
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             stmt.setInt(1, loan.getLoan_id());
 //            stmt.setInt(2, loan.getLoanType());
             stmt.setInt(2, loan.getPBalance());
-            stmt.setInt(3, loan.getTerm());
-            stmt.setInt(4, loan.getInterest());
-            stmt.setInt(5, loan.getTBalance());
+            stmt.setString(3, "pending");
 //            stmt.setInt(7, getAppStatusId());
-            stmt.setInt(6, loan.getBorrower_id());
-            stmt.setObject(7, loan.getApp_date());
-            stmt.setString(8, loan.getLoan_name());
+            stmt.setInt(4, loan.getBorrower_id());
+            stmt.setObject(5, loan.getApp_date());
+            stmt.setString(6, loan.getLoan_name());
             stmt.executeUpdate();
 
             try(ResultSet genKeys = stmt.getGeneratedKeys()){
@@ -61,9 +59,9 @@ public class LoanDao {
                         rS.getInt("loan_app_id"),
                         /*rS.getInt("loan_type_id"),*/
                         rS.getInt("principal_balance"),
-                        rS.getInt("term_length"),
-                        rS.getInt("interest"),
-                        rS.getInt("total_balance"),
+                        rS.getString("approved"),
+//                        rS.getInt("interest"),
+//                        rS.getInt("total_balance"),
                         /*rS.getInt("application_status_id"),*/
                         rS.getInt("borrower_id"),
                         rS.getObject("application_date"),
@@ -93,9 +91,7 @@ public class LoanDao {
                             rS.getInt("loan_app_id"),
                             /*rS.getInt("loan_type_id"),*/
                             rS.getInt("principal_balance"),
-                            rS.getInt("term_length"),
-                            rS.getInt("interest"),
-                            rS.getInt("total_balance"),
+                            rS.getString("approved"),
                             /*rS.getInt("application_status_id"),*/
                             rS.getInt("borrower_id"),
                             rS.getObject("application_date"),
@@ -112,15 +108,13 @@ public class LoanDao {
 
     /*Update an existing loan */
     public void updateLoan(Loan loan){
-        String sql = "UPDATE loan_apps SET loan_app_id = ?, principal_balance = ?, term_length = ?, interest = ?, total_balance = ?, application_date = ?, loan_name = ?  WHERE borrower_id = ?";
+        String sql = "UPDATE loan_apps SET loan_app_id = ?, principal_balance = ?, approved = ?, application_date = ?, loan_name = ?  WHERE borrower_id = ?";
         try(Connection conn = DriverManager.getConnection(url, dbUser, dbPassword);
             PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setInt(1, loan.getLoan_id());
             //stmt.setInt(2, loan.getLoanType());
             stmt.setInt(2, loan.getPBalance());
-            stmt.setInt(3, loan.getTerm());
-            stmt.setInt(4, loan.getInterest());
-            stmt.setInt(5, loan.getTBalance());
+            stmt.setString(3, loan.getApproved());
             //stmt.setInt(7, getAppStatusId());
             stmt.setInt(6, loan.getBorrower_id());
             stmt.setObject(7, loan.getApp_date());

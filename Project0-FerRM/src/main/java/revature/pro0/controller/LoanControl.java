@@ -4,7 +4,10 @@ import revature.pro0.dto.LoanRequestDTO;
 import revature.pro0.model.Loan;
 import revature.pro0.service.LoanService;
 import io.javalin.http.Context;
+
+import java.time.LocalDate;
 import java.util.List;
+
 
 public class LoanControl {
 
@@ -16,13 +19,11 @@ public class LoanControl {
     * POST /loans
     * JSON
     * {
+*       "principal_balance": 50,000,
+    *   "approved": "pending", //auto
     *   "borrower_id": 1,
-    *   "loan_name": "Car purchase",
-    *   "term_length": 1,
-    *   "principal_balance": 50,000,
-    *   "interest" : 12,
-    *   "total_balance": 53,309
-    *   "application_date": 14-02-2025
+    *   "application_date": 14-02-2025, //auto
+    *   "loan_name": "Car purchase"
     *
     * }
     * */
@@ -37,11 +38,9 @@ public class LoanControl {
         Loan loan = new Loan();
         loan.setBorrower_id(req.getBorrowerId());
         loan.setLoan_name(req.getLoan_name());
-        loan.setTerm(req.getTerm());
+        loan.setApproved(req.getApproved());
         loan.setPBalance(req.getPBalance());
-        loan.setInterest(req.getInterest());
-        loan.setTBalance(req.getTBalance());
-        loan.setApp_date(req.getAppDate());
+        loan.setApp_date(LocalDate.now());
         loanService.addLoan(loan);
 
         cont.status(201).json(loan);
@@ -66,7 +65,7 @@ public class LoanControl {
     *
     * {
     *   "loan_name": "New Title",
-    *   "principal_balance": 0
+    *   "principal_balance": 10000
     *
     *  */
     public void updateLoan(Context cont){
