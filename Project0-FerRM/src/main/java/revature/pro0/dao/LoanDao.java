@@ -116,9 +116,9 @@ public class LoanDao {
             stmt.setInt(2, loan.getPBalance());
             stmt.setString(3, loan.getApproved());
             //stmt.setInt(7, getAppStatusId());
-            stmt.setInt(6, loan.getBorrower_id());
-            stmt.setObject(7, loan.getApp_date());
-            stmt.setString(8, loan.getLoan_name());
+            stmt.setInt(4, loan.getBorrower_id());
+            stmt.setObject(5, loan.getApp_date());
+            stmt.setString(6, loan.getLoan_name());
             stmt.executeUpdate();
         }catch (SQLException e){
             e.printStackTrace();

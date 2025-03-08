@@ -2,10 +2,12 @@ package revature.pro0;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import revature.pro0.controller.AuthControl;
 import revature.pro0.controller.LoanControl;
 import revature.pro0.controller.UserControl;
 import revature.pro0.dao.LoanDao;
 import revature.pro0.dao.UserDao;
+import revature.pro0.service.AuthService;
 import revature.pro0.service.LoanService;
 import revature.pro0.service.UserService;
 import io.javalin.Javalin;
@@ -63,9 +65,11 @@ public class Main {
 
         UserService userService = new UserService(userDao);
         LoanService loanService = new LoanService(loanDao);
+        AuthService authService = new AuthService(userDao);
 
         UserControl userControl = new UserControl(userService);
         LoanControl loanControl1 = new LoanControl(loanService);
+        AuthControl authControl = new AuthControl(authService);
 
         //Start Javalin
         Javalin app = Javalin.create(config ->{
@@ -86,11 +90,15 @@ public class Main {
         app.delete("/loans/{id}", loanControl1::deleteLoan);
         app.get("/loans", loanControl1::getAllLoans);
 
+        //app.post("/auth/register", authControl::register);
+        //app.post("/auth/login", authControl::login);
+        app.post("/auth/logout", authControl::logout);
+
         System.out.println("Server running on localhost:7000");
 
-        List<String> names = Arrays.asList("Luis", "Niko", "CJ");
+        /*List<String> names = Arrays.asList("Luis", "Niko", "CJ");
         names.sort((a, b) -> a.compareTo(b));
-        System.out.println(names);
+        System.out.println(names);*/
         }
 
         //Reset DB
